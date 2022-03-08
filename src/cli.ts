@@ -48,6 +48,11 @@ export async function run() {
         desc: "`<USER|ORG>/<PROJECT>` of the GitHub project",
         defaultDescription: "inferred from the `package.json` file",
       },
+      cli: {
+        type: "boolean",
+        desc: "Decide whether to use gh (cli) for api requests and git info. This allows support for GHE",
+        default: false,
+      },
     })
     .example(
       "lerna-changelog",
@@ -70,6 +75,7 @@ export async function run() {
     let config = loadConfig({
       nextVersionFromMetadata: argv["next-version-from-metadata"],
       repo: argv.repo,
+      cli: argv.cli,
     });
 
     if (argv["next-version"] !== NEXT_VERSION_DEFAULT) {

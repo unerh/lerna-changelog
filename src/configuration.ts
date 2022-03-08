@@ -7,6 +7,7 @@ import ConfigurationError from "./configuration-error";
 import { getRootPath } from "./git";
 
 export interface Configuration {
+  cli: boolean | undefined;
   repo: string;
   rootPath: string;
   labels: { [key: string]: string };
@@ -17,6 +18,7 @@ export interface Configuration {
 }
 
 export interface ConfigLoaderOptions {
+  cli?: boolean;
   repo?: string;
   nextVersionFromMetadata?: boolean;
 }
@@ -33,12 +35,15 @@ export function fromPath(rootPath: string, options: ConfigLoaderOptions = {}): C
   if (options.repo) {
     config.repo = options.repo;
   }
+  if (options.cli) {
+    config.cli = options.cli;
+  }
 
   // Step 2: fill partial config with defaults
-  let { repo, nextVersion, labels, cacheDir, ignoreCommitters } = config;
+  let { cli, repo, nextVersion, labels, cacheDir, ignoreCommitters } = config;
 
   if (!repo) {
-    repo = findRepo(rootPath);
+    repo = findRepo(rootPath, config);
     if (!repo) {
       throw new ConfigurationError('Could not infer "repo" from the "package.json" file.');
     }
@@ -75,6 +80,7 @@ export function fromPath(rootPath: string, options: ConfigLoaderOptions = {}): C
   }
 
   return {
+    cli,
     repo,
     nextVersion,
     rootPath,
@@ -98,7 +104,7 @@ function fromPackageConfig(rootPath: string): Partial<Configuration> | undefined
   }
 }
 
-function findRepo(rootPath: string): string | undefined {
+function findRepo(rootPath: string, config?: Partial<Configuration>): string | undefined {
   const pkgPath = path.join(rootPath, "package.json");
   if (!fs.existsSync(pkgPath)) {
     return;
@@ -109,7 +115,7 @@ function findRepo(rootPath: string): string | undefined {
     return;
   }
 
-  return findRepoFromPkg(pkg);
+  return findRepoFromPkg(pkg, config);
 }
 
 function findNextVersion(rootPath: string): string | undefined {
@@ -122,8 +128,12 @@ function findNextVersion(rootPath: string): string | undefined {
   return pkg.version ? `v${pkg.version}` : lerna.version ? `v${lerna.version}` : undefined;
 }
 
-export function findRepoFromPkg(pkg: any): string | undefined {
+export function findRepoFromPkg(pkg: any, config?: Partial<Configuration>): string | undefined {
   const url = pkg.repository.url || pkg.repository;
+  if (config?.cli) {
+    // gh repo view --json nameWithOwner --jq '.nameWithOwner'
+    return execa.sync("gh", ["repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner"]).stdout;
+  }
   const info = hostedGitInfo.fromUrl(url);
   if (info && info.type === "github") {
     return `${info.user}/${info.project}`;

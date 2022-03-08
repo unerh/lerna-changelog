@@ -1,3 +1,4 @@
+const execa = require("execa");
 const path = require("path");
 
 import ConfigurationError from "./configuration-error";
