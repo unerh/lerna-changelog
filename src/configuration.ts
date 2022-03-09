@@ -131,7 +131,6 @@ function findNextVersion(rootPath: string): string | undefined {
 export function findRepoFromPkg(pkg: any, config?: Partial<Configuration>): string | undefined {
   const url = pkg.repository.url || pkg.repository;
   if (config?.cli) {
-    // gh repo view --json nameWithOwner --jq '.nameWithOwner'
     return execa.sync("gh", ["repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner"]).stdout;
   }
   const info = hostedGitInfo.fromUrl(url);
