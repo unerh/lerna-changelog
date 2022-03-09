@@ -31,7 +31,8 @@
     "release": "release-it",
     "test": "jest",
     "test-ci": "yarn build && yarn test",
-    "watch": "yarn build -- --watch"
+    "watch": "yarn build -- --watch",
+    "postinstall": "yarn build"
   },
   "dependencies": {
     "chalk": "^4.0.0",
