@@ -22,7 +22,7 @@
   },
   "scripts": {
     "build": "yarn clean && tsc",
-    "changelog": "node ./bin/cli.js",
+    "changelog": "node ./lib/cli.js",
     "clean": "rimraf lib",
     "fix": "yarn lint -- --fix",
     "lint": "eslint src --ext ts --format stylish",
@@ -31,8 +31,7 @@
     "release": "release-it",
     "test": "jest",
     "test-ci": "yarn build && yarn test",
-    "watch": "yarn build -- --watch",
-    "postinstall": "yarn build"
+    "watch": "yarn build -- --watch"
   },
   "dependencies": {
     "chalk": "^4.0.0",
