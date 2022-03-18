@@ -14,7 +14,7 @@
   "author": "Bo Borgerson <gigabo@gmail.com>",
   "main": "index.js",
   "bin": {
-    "lerna-changelog": "bin/cli.js"
+    "lerna-changelog": "lib/cli.js"
   },
   "repository": {
     "type": "git",
